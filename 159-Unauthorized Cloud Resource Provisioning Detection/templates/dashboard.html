@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-primary px-4">
+    <span class="navbar-brand">Cloud Security SOC</span>
+    <div class="text-white">
+        Welcome, {{session['username']}}
+        <a href="/logout" class="btn btn-danger btn-sm ms-3">Logout</a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+<div class="row text-center mb-4">
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6>Total Resources</h6>
+            <h3 class="text-primary">{{total}}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6>Suspicious</h6>
+            <h3 class="text-danger">{{suspicious}}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6>Total Cost</h6>
+            <h3 class="text-success">₹{{total_cost}}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow p-3">
+            <h6>Threat Level</h6>
+            {% if suspicious > 3 %}
+                <h3 class="text-danger">HIGH</h3>
+            {% elif suspicious > 1 %}
+                <h3 class="text-warning">MEDIUM</h3>
+            {% else %}
+                <h3 class="text-success">LOW</h3>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h5>Add Cloud Resource</h5>
+
+<form method="POST" action="/add_resource" class="row g-2">
+    <div class="col-md-2"><input name="name" class="form-control" placeholder="Name" required></div>
+    <div class="col-md-2">
+        <select name="type" class="form-control">
+            <option>EC2</option>
+            <option>S3</option>
+            <option>RDS</option>
+        </select>
+    </div>
+    <div class="col-md-2"><input name="region" class="form-control" placeholder="Region" required></div>
+    <div class="col-md-2"><input name="cost" type="number" step="0.01" class="form-control" placeholder="Cost"></div>
+    <div class="col-md-2">
+        <select name="status" class="form-control">
+            <option>Running</option>
+            <option>Stopped</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-success w-100">Add</button>
+    </div>
+</form>
+
+<hr>
+
+<h5>Your Resources</h5>
+
+<table class="table table-bordered table-striped">
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Region</th>
+<th>Cost</th>
+<th>Status</th>
+<th>Risk</th>
+<th>Action</th>
+</tr>
+
+{% for r in resources %}
+<tr class="{% if r[7] %}table-danger{% endif %}">
+<td>{{r[2]}}</td>
+<td>{{r[3]}}</td>
+<td>{{r[4]}}</td>
+<td>₹{{r[5]}}</td>
+<td>{{r[6]}}</td>
+
+<td>
+{% if r[7] %}
+<span class="badge bg-danger">Suspicious ({{r[8]}}%)</span>
+{% else %}
+<span class="badge bg-success">Normal</span>
+{% endif %}
+</td>
+
+<td>
+<a href="/edit_resource/{{r[0]}}" class="btn btn-warning btn-sm">Edit</a>
+<a href="/delete_resource/{{r[0]}}" class="btn btn-danger btn-sm">Delete</a>
+</td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+</body>
+</html>
